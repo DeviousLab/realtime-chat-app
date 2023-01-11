@@ -4,7 +4,7 @@
   "description": "GraphQL backend for realtime chat app",
   "main": "index.ts",
   "scripts": {
-    "dev": "nodemon index.ts"
+    "dev": "nodemon src/index.ts"
   },
   "keywords": [
     "graphql",
