@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "GraphQL backend for realtime chat app",
   "main": "index.ts",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon --files src/index.ts"
   },
   "keywords": [
     "graphql",
