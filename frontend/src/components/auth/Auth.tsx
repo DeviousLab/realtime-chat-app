@@ -3,6 +3,7 @@ import { Button, Center, Image, Input, Stack, Text } from '@chakra-ui/react';
 import { Session } from 'next-auth';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 import UserOperations from '../../graphql/operations/user';
 import { CreateUserData, CreateUserVariables } from '../../util/types';
@@ -37,8 +38,10 @@ const Auth = ({ session, reloadSession }: AuthProps) => {
 				throw new Error(error);
 			}
 			reloadSession();
-		} catch (error) {
+			toast.success('Username created!');
+		} catch (error: any) {
 			console.log(error);
+			toast.error(error);
 		}
 	};
 
