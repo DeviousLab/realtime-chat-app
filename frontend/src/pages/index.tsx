@@ -9,8 +9,6 @@ import Chat from '../components/chat/Chat';
 export default function Home() {
   const { data: session } = useSession();
 
-  console.log(session)
-
   const reloadSession = () => {
     const event = new Event('visibilitychange');
     document.dispatchEvent(event);
