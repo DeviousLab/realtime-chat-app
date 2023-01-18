@@ -1,8 +1,36 @@
+import { User } from '@prisma/client';
+import { ApolloError } from 'apollo-server-core';
 import { CreateUserResponse, GraphQLContext } from '../../util/types';
 
 const resolvers = {
 	Query: {
-		searchUsers: () => {},
+		searchUsers: async (
+			_: any,
+			args: { username: string },
+			context: GraphQLContext
+		): Promise<Array<User>> => {
+			const { username: usernameQuery } = args;
+			const { prisma, session } = context;
+			if (!session?.user) {
+				throw new ApolloError('You must be logged in to search users');
+			}
+			const { user: { username: currentUsername } } = session;
+			try {
+				const users = await prisma.user.findMany({
+					where: {
+						username: {
+							contains: usernameQuery,
+							mode: 'insensitive',
+							not: currentUsername,
+						}
+					}
+				});
+				return users;
+			} catch (error) {
+				console.log(error);
+				throw new ApolloError('There was an error searching users');
+			}
+		},
 	},
 
 	Mutation: {
