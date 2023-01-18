@@ -25,7 +25,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Box>
-        {session?.user?.username ? <Chat/> : <Auth session={session} reloadSession={reloadSession} />}
+        {session?.user?.username ? <Chat session={session} /> : <Auth session={session} reloadSession={reloadSession} />}
       </Box>
     </>
   )
