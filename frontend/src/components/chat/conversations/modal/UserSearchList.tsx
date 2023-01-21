@@ -3,9 +3,10 @@ import { SearchedUser } from '../../../../util/types';
 
 type UserSearchListProps = {
 	users: Array<SearchedUser>;
+  addParticipant: (user: SearchedUser) => void;
 };
 
-const UserSearchList = ({ users }: UserSearchListProps) => {
+const UserSearchList = ({ users, addParticipant }: UserSearchListProps) => {
 	return (
 		<>
 			{users.length === 0 ? (
@@ -28,7 +29,7 @@ const UserSearchList = ({ users }: UserSearchListProps) => {
 							<Avatar />
 							<Flex justify="space-between" align="center" width="100%">
 								<Text>{user.username}</Text>
-                <Button bg="brand.100" _hover={{ bg: "brand.100" }} onClick={() => {}}>Select</Button>
+                <Button bg="brand.100" _hover={{ bg: "brand.100" }} onClick={() => addParticipant(user)}>Select</Button>
 							</Flex>
 						</Stack>
 					))}

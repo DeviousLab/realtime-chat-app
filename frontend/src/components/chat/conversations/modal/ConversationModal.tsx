@@ -14,7 +14,12 @@ import {
 import { useState } from 'react';
 
 import UserOperations from '../../../../graphql/operations/user';
-import { SearchUsersData, SearchUsersInput } from '../../../../util/types';
+import {
+	SearchedUser,
+	SearchUsersData,
+	SearchUsersInput,
+} from '../../../../util/types';
+import Participants from './Participants';
 import UserSearchList from './UserSearchList';
 
 type ModalProps = {
@@ -24,6 +29,7 @@ type ModalProps = {
 
 const ConversationModal = ({ isOpen, onClose }: ModalProps) => {
 	const [username, setUsername] = useState<string>('');
+	const [participants, setParticipants] = useState<Array<SearchedUser>>([]);
 	const [searchUsers, { data, loading, error }] = useLazyQuery<
 		SearchUsersData,
 		SearchUsersInput
@@ -34,7 +40,14 @@ const ConversationModal = ({ isOpen, onClose }: ModalProps) => {
 		searchUsers({ variables: { username } });
 	};
 
-	console.log(data)
+	const addParticipant = (user: SearchedUser) => {
+		setParticipants((prev) => [...prev, user]);
+		setUsername('');
+	};
+
+	const removeParticipant = (userId: string) => {
+		setParticipants((prev) => prev.filter((user) => user.id !== userId));
+	};
 
 	return (
 		<>
@@ -55,7 +68,18 @@ const ConversationModal = ({ isOpen, onClose }: ModalProps) => {
 								</Button>
 							</Stack>
 						</form>
-						{data?.searchUsers && <UserSearchList users={data.searchUsers}/>}
+						{data?.searchUsers && (
+							<UserSearchList
+								users={data.searchUsers}
+								addParticipant={addParticipant}
+							/>
+						)}
+						{participants.length !== 0 && (
+							<Participants
+								participants={participants}
+								removeParticipant={removeParticipant}
+							/>
+						)}
 					</ModalBody>
 				</ModalContent>
 			</Modal>
