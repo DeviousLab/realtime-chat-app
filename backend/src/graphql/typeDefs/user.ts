@@ -6,6 +6,15 @@ const typeDefs = gql`
     username: String
   }
 
+  type User {
+    id: String
+    name: String
+    username: String
+    email: String
+    emailVerified: Boolean
+    image: String
+  }
+
   type Query {
     searchUsers(username: String): [SearchedUser]
   }

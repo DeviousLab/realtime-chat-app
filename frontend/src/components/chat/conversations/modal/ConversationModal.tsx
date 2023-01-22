@@ -13,6 +13,8 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { Session } from 'next-auth';
+import { useRouter } from 'next/router';
 
 import UserOperations from '../../../../graphql/operations/user';
 import {
@@ -25,7 +27,6 @@ import {
 import Participants from './Participants';
 import UserSearchList from './UserSearchList';
 import ConversationOperations from '../../../../graphql/operations/conversation';
-import { Session } from 'next-auth';
 
 type ModalProps = {
 	isOpen: boolean;
@@ -44,8 +45,11 @@ const ConversationModal = ({ isOpen, onClose, session }: ModalProps) => {
 		CreateConversationData,
 		CreateConversationVariables
 	>(ConversationOperations.Mutations.createConversation);
+	const router = useRouter();
 
-	const { user: { id: userId } } = session;
+	const {
+		user: { id: userId },
+	} = session;
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -65,14 +69,23 @@ const ConversationModal = ({ isOpen, onClose, session }: ModalProps) => {
 		const participantIds = [userId, ...participants.map((user) => user.id)];
 		try {
 			const { data } = await createConversation({
-				variables: { 
+				variables: {
 					participantIds,
 				},
 			});
-			if (data) {
-				toast.success('Conversation created!');
-				onClose();
+			if (!data?.createConversation) {
+				throw new Error('Failed to create conversation');
 			}
+			const {
+				createConversation: { conversationId },
+			} = data;
+
+			router.push({ query: { conversationId } });
+			toast.success('Conversation created!');
+
+			setParticipants([]);
+			setUsername('');
+			onClose();
 		} catch (error: any) {
 			console.error(error);
 			toast.error('Something went wrong! Please try again later.');
@@ -115,7 +128,7 @@ const ConversationModal = ({ isOpen, onClose, session }: ModalProps) => {
 									width='100%'
 									mt={6}
 									_hover={{ bg: 'brand.100' }}
-									onClick={() => createConversation()}
+									onClick={() => onCreateConversation()}
 									isLoading={conversationLoading}
 								>
 									Start Conversation

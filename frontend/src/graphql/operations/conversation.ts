@@ -1,16 +1,45 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
+
+const ConversationFields = `
+    id
+    participants {
+    user {
+      id
+      username
+    }
+    hasSeenLatestMessage
+    }
+    lastMessage {
+      id
+      user {
+        id
+        username
+      }
+      content
+      createdAt
+    }
+    updatedAt
+`;
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
-  Queries: { },
-  Mutations: {
-    createConversation: gql`
-      mutation CreateConversation($participantIds: [String]!) {
-        createConversation(participantIds: $participantIds) {
-          conversationId
+	Queries: {
+		getConversations: gql`
+			query GetConversations {
+				getConversations {
+          ${ConversationFields}
         }
-      }
-      `
-  },
-  Subscriptions: {},
-}
+			}
+		`,
+	},
+	Mutations: {
+		createConversation: gql`
+			mutation CreateConversation($participantIds: [String]!) {
+				createConversation(participantIds: $participantIds) {
+					conversationId
+				}
+			}
+		`,
+	},
+	Subscriptions: {},
+};
