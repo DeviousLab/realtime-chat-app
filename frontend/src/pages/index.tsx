@@ -9,8 +9,6 @@ import Chat from '../components/chat/Chat';
 export default function Home() {
   const { data: session } = useSession();
 
-  console.log(session)
-
   const reloadSession = () => {
     const event = new Event('visibilitychange');
     document.dispatchEvent(event);
@@ -25,7 +23,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Box>
-        {session?.user?.username ? <Chat/> : <Auth session={session} reloadSession={reloadSession} />}
+        {session?.user?.username ? <Chat session={session} /> : <Auth session={session} reloadSession={reloadSession} />}
       </Box>
     </>
   )
