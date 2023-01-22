@@ -1,3 +1,5 @@
+import { ConversationPopulated } from "../../../backend/src/util/types";
+
 export interface CreateUserData {
 	createUser: {
 		success: boolean;
@@ -30,4 +32,8 @@ export interface CreateConversationData {
 
 export interface CreateConversationVariables {
 	participantIds: Array<string>;
+}
+
+export interface ConversationsData {
+	conversations: Array<ConversationPopulated>
 }

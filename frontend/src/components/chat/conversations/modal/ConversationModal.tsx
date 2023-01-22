@@ -47,7 +47,9 @@ const ConversationModal = ({ isOpen, onClose, session }: ModalProps) => {
 	>(ConversationOperations.Mutations.createConversation);
 	const router = useRouter();
 
-	const { user: { id: userId } } = session;
+	const {
+		user: { id: userId },
+	} = session;
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -67,14 +69,16 @@ const ConversationModal = ({ isOpen, onClose, session }: ModalProps) => {
 		const participantIds = [userId, ...participants.map((user) => user.id)];
 		try {
 			const { data } = await createConversation({
-				variables: { 
+				variables: {
 					participantIds,
 				},
 			});
 			if (!data?.createConversation) {
 				throw new Error('Failed to create conversation');
 			}
-			const { createConversation: { conversationId }} = data;
+			const {
+				createConversation: { conversationId },
+			} = data;
 
 			router.push({ query: { conversationId } });
 			toast.success('Conversation created!');
@@ -82,7 +86,6 @@ const ConversationModal = ({ isOpen, onClose, session }: ModalProps) => {
 			setParticipants([]);
 			setUsername('');
 			onClose();
-
 		} catch (error: any) {
 			console.error(error);
 			toast.error('Something went wrong! Please try again later.');
@@ -125,7 +128,7 @@ const ConversationModal = ({ isOpen, onClose, session }: ModalProps) => {
 									width='100%'
 									mt={6}
 									_hover={{ bg: 'brand.100' }}
-									onClick={() => createConversation()}
+									onClick={() => onCreateConversation()}
 									isLoading={conversationLoading}
 								>
 									Start Conversation
