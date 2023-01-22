@@ -1,8 +1,39 @@
 import { Prisma } from '@prisma/client';
 import { ApolloError } from 'apollo-server-core';
-import { GraphQLContext } from '../../util/types';
+import { ConversationPopulated, GraphQLContext } from '../../util/types';
 
 const resolvers = {
+	Query: {
+		getConversations: async (
+			_: any,
+			__: any,
+			context: GraphQLContext
+		): Promise<Array<ConversationPopulated>> => {
+			const { session, prisma } = context;
+
+			if (!session?.user) {
+				throw new ApolloError('Not authenticated');
+			}
+
+			const {
+				user: { id: userId },
+			} = session;
+
+			try {
+				const conversations = await prisma.conversation.findMany({
+					include: ConversationPopulate,
+				});
+				return conversations.filter((conversation) => {
+					!!conversation.participants.find(
+						(participant) => participant.userId === userId
+					);
+				});
+			} catch (error) {
+				console.error(error);
+				throw new ApolloError('Error getting conversations');
+			}
+		},
+	},
 	Mutation: {
 		createConversation: async (
 			_: any,
@@ -43,14 +74,15 @@ const resolvers = {
 	},
 };
 
-export const ParticipantPopulate = Prisma.validator<Prisma.ConversationParticipantInclude>()({
-	user: {
-		select: {
-			id: true,
-			username: true,
+export const ParticipantPopulate =
+	Prisma.validator<Prisma.ConversationParticipantInclude>()({
+		user: {
+			select: {
+				id: true,
+				username: true,
+			},
 		},
-	},
-});
+	});
 
 export const ConversationPopulate =
 	Prisma.validator<Prisma.ConversationInclude>()({

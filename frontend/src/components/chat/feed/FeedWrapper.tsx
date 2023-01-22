@@ -22,7 +22,9 @@ const FeedWrapper = ({ session }: FeedWrapperProps) => {
 						justify='space-between'
 						overflow='hidden'
 						flexGrow={1}
-					></Flex>
+					>
+						{conversationId}
+					</Flex>
 				</>
 			) : (
 				<div>No Conversation</div>
