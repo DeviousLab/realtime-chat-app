@@ -18,9 +18,13 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 	} = useQuery<ConversationsData, null>(
 		ConversationOperations.Queries.getConversations
 	);
+	console.log(conversationData)
 	return (
 		<Box width={{ base: '100%', md: '25rem' }} bg='whiteAlpha.50' py={6} px={3}>
-			<ConversationList session={session} />
+			<ConversationList
+				session={session}
+				conversations={conversationData?.getConversations || []}
+			/>
 		</Box>
 	);
 };

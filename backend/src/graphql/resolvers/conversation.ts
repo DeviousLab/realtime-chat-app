@@ -23,11 +23,12 @@ const resolvers = {
 				const conversations = await prisma.conversation.findMany({
 					include: ConversationPopulate,
 				});
-				return conversations.filter((conversation) => {
-					!!conversation.participants.find(
-						(participant) => participant.userId === userId
-					);
-				});
+				return conversations.filter(
+					(conversation) =>
+						!!conversation.participants.find(
+							(participant) => participant.userId === userId
+						)
+				);
 			} catch (error) {
 				console.error(error);
 				throw new ApolloError('Error getting conversations');

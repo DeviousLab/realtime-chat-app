@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Session } from "next-auth"
+
 import { ConversationPopulate, ParticipantPopulate } from "../graphql/resolvers/conversation";
 
 export interface GraphQLContext {

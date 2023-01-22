@@ -27,7 +27,7 @@ const resolvers = {
 				});
 				return users;
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 				throw new ApolloError('There was an error searching users');
 			}
 		},

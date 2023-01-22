@@ -40,7 +40,7 @@ const Auth = ({ session, reloadSession }: AuthProps) => {
 			reloadSession();
 			toast.success('Username created!');
 		} catch (error: any) {
-			console.log(error);
+			console.error(error);
 			toast.error(error);
 		}
 	};
