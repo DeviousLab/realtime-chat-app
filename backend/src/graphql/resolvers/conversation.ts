@@ -1,6 +1,12 @@
 import { Prisma } from '@prisma/client';
 import { ApolloError } from 'apollo-server-core';
-import { ConversationPopulated, GraphQLContext } from '../../util/types';
+import { withFilter } from 'graphql-subscriptions';
+
+import {
+	ConversationCreatedSubscriptionPayload,
+	ConversationPopulated,
+	GraphQLContext,
+} from '../../util/types';
 
 const resolvers = {
 	Query: {
@@ -23,11 +29,12 @@ const resolvers = {
 				const conversations = await prisma.conversation.findMany({
 					include: ConversationPopulate,
 				});
-				return conversations.filter((conversation) => {
-					!!conversation.participants.find(
-						(participant) => participant.userId === userId
-					);
-				});
+				return conversations.filter(
+					(conversation) =>
+						!!conversation.participants.find(
+							(participant) => participant.userId === userId
+						)
+				);
 			} catch (error) {
 				console.error(error);
 				throw new ApolloError('Error getting conversations');
@@ -40,7 +47,7 @@ const resolvers = {
 			args: { participantIds: Array<string> },
 			context: GraphQLContext
 		): Promise<{ conversationId: string }> => {
-			const { session, prisma } = context;
+			const { session, prisma, pubsub } = context;
 			const { participantIds } = args;
 
 			if (!session?.user) {
@@ -65,11 +72,43 @@ const resolvers = {
 					},
 					include: ConversationPopulate,
 				});
+
+				pubsub.publish('CONVERSATION_CREATED', {
+					conversationCreated: conversation,
+				});
+
 				return { conversationId: conversation.id };
 			} catch (error) {
 				console.error(error);
 				throw new ApolloError('Error creating conversation');
 			}
+		},
+	},
+	Subscription: {
+		conversationCreated: {
+			subscribe: withFilter(
+				(_: any, __: any, context: GraphQLContext) => {
+					const { pubsub } = context;
+
+					return pubsub.asyncIterator(['CONVERSATION_CREATED']);
+				},
+				(
+					payload: ConversationCreatedSubscriptionPayload,
+					_,
+					context: GraphQLContext
+				) => {
+					const { session } = context;
+					const {
+						conversationCreated: { participants },
+					} = payload;
+
+					const userIsParticipant = !!participants.find(
+						(participant) => participant.userId === session?.user?.id
+					);
+
+					return userIsParticipant;
+				}
+			),
 		},
 	},
 };

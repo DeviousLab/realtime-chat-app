@@ -35,5 +35,5 @@ export interface CreateConversationVariables {
 }
 
 export interface ConversationsData {
-	conversations: Array<ConversationPopulated>
+	getConversations: Array<ConversationPopulated>
 }
