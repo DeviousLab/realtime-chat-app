@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { ApolloError } from 'apollo-server-core';
+import { GraphQLError } from 'graphql';
 import { CreateUserResponse, GraphQLContext } from '../../util/types';
 
 const resolvers = {
@@ -12,7 +12,7 @@ const resolvers = {
 			const { username: usernameQuery } = args;
 			const { prisma, session } = context;
 			if (!session?.user) {
-				throw new ApolloError('You must be logged in to search users');
+				throw new GraphQLError('You must be logged in to search users');
 			}
 			const { user: { username: currentUsername } } = session;
 			try {
@@ -28,7 +28,7 @@ const resolvers = {
 				return users;
 			} catch (error) {
 				console.error(error);
-				throw new ApolloError('There was an error searching users');
+				throw new GraphQLError('There was an error searching users');
 			}
 		},
 	},
