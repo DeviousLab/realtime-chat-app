@@ -41,5 +41,13 @@ export default {
 			}
 		`,
 	},
-	Subscriptions: {},
+	Subscriptions: {
+    conversationCreated: gql`
+      subscription ConversationCreated {
+        conversationCreated {
+          ${ConversationFields}
+        }
+      }
+    `
+  },
 };
