@@ -36,6 +36,7 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 				}
 			) => {
 				if (!subscriptionData.data) return prev;
+				console.log('subscriptionData: ', subscriptionData)
 				const newConversation = subscriptionData.data.conversationCreated;
 				return Object.assign({}, prev, {
 					getConversations: [newConversation, ...prev.getConversations],
