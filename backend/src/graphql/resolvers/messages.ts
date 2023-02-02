@@ -2,7 +2,11 @@ import { Prisma } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { withFilter } from 'graphql-subscriptions';
 
-import { GraphQLContext, SendMessageArgs } from '../../util/types';
+import {
+	GraphQLContext,
+	SendMessageArgs,
+	MessageSendSubscriptionPayload,
+} from '../../util/types';
 
 const resolvers = {
 	Query: {},
@@ -32,7 +36,7 @@ const resolvers = {
 						userId: senderId,
 						content: body,
 					},
-					include: messagePopulated,
+					include: MessagePopulate,
 				});
 				const conversation = await prisma.conversation.update({
 					where: {
@@ -74,10 +78,26 @@ const resolvers = {
 			return true;
 		},
 	},
-	Subscription: {},
+	Subscription: {
+		messageSent: {
+			subscribe: withFilter(
+				(_: any, __: any, context: GraphQLContext) => {
+					const { pubsub } = context;
+					return pubsub.asyncIterator('MESSAGE_SENT');
+				},
+				(
+					payload: MessageSendSubscriptionPayload,
+					args: { conversationId: string },
+					context: GraphQLContext
+				) => {
+					return payload.messageSent.conversationId === args.conversationId;
+				}
+			),
+		},
+	},
 };
 
-export const messagePopulated = Prisma.validator<Prisma.MessageInclude>()({
+export const MessagePopulate = Prisma.validator<Prisma.MessageInclude>()({
 	user: {
 		select: {
 			id: true,

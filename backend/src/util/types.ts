@@ -4,6 +4,7 @@ import { Context } from "graphql-ws/lib/server";
 import { Session } from "next-auth"
 
 import { ConversationPopulate, ParticipantPopulate } from "../graphql/resolvers/conversation";
+import { MessagePopulate } from "../graphql/resolvers/messages";
 
 export interface GraphQLContext {
   session: Session | null;
@@ -39,4 +40,12 @@ export interface SendMessageArgs {
   conversationId: string;
   senderId: string;
   body: string;
+}
+
+export type MessagePopulated = Prisma.MessageGetPayload<{
+  include: typeof MessagePopulate
+}>
+
+export interface MessageSendSubscriptionPayload {
+  messageSent: Prisma.MessageGetPayload<{}>
 }
