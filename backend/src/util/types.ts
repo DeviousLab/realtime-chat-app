@@ -33,3 +33,10 @@ export type ParticipantPopulated = Prisma.ConversationParticipantGetPayload<{
 export interface ConversationCreatedSubscriptionPayload {
   conversationCreated: ConversationPopulated
 }
+
+export interface SendMessageArgs {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  body: string;
+}
