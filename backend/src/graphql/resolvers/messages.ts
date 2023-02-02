@@ -1,15 +1,73 @@
 import { Prisma } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { withFilter } from 'graphql-subscriptions';
+import { userIsConversationParticipant } from '../../util/functions';
 
 import {
 	GraphQLContext,
 	SendMessageArgs,
 	MessageSendSubscriptionPayload,
+	MessagePopulated,
 } from '../../util/types';
+import { ConversationPopulate } from './conversation';
 
 const resolvers = {
-	Query: {},
+	Query: {
+		messages: async (
+			_: any,
+			args: SendMessageArgs,
+			context: GraphQLContext
+		): Promise<Array<MessagePopulated>> => {
+			const { session, prisma } = context;
+			const { conversationId } = args;
+
+			if (!session?.user) {
+				throw new GraphQLError('Unauthorised');
+			}
+
+			const {
+				user: { id: userId },
+			} = session;
+
+			const conversation = await prisma.conversation.findUnique({
+				where: {
+					id: conversationId,
+				},
+				include: ConversationPopulate,
+			});
+
+			if (!conversation) {
+				throw new GraphQLError('Conversation not found');
+			}
+
+			const isParticipant = userIsConversationParticipant(
+				conversation.participants,
+				userId
+			);
+
+      if (!isParticipant) {
+        throw new GraphQLError('Unauthorised');
+      }
+
+      try {
+        const messages = await prisma.message.findMany({
+          where: {
+            conversationId,
+          },
+          include: MessagePopulate,
+          orderBy: {
+            createdAt: 'desc',
+          }
+        });
+        return messages;
+      } catch (error) {
+        console.error(error);
+        throw new GraphQLError('Error fetching messages');
+      }
+
+			return [];
+		},
+	},
 	Mutation: {
 		sendMessage: async (
 			_: any,
@@ -20,12 +78,12 @@ const resolvers = {
 			const { id: messageId, conversationId, senderId, body } = args;
 
 			if (!session?.user) {
-				throw new GraphQLError('Unauthorized');
+				throw new GraphQLError('Unauthorised');
 			}
 			const { id: sessionUserId } = session.user;
 
 			if (sessionUserId !== senderId) {
-				throw new GraphQLError('Unauthorized');
+				throw new GraphQLError('Unauthorised');
 			}
 
 			try {

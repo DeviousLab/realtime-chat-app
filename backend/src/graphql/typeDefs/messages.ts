@@ -22,6 +22,10 @@ const typeDefs = gql`
   type Subscription {
     messageSent(conversationId: String): Message
   }
+
+	type Query {
+		messages(conversationId: String): [Message]
+	}
 `;
 
 export default typeDefs;
