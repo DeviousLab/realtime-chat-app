@@ -7,6 +7,7 @@ import { ObjectId } from 'bson';
 
 import MessageOperations from '../../../../graphql/operations/messages';
 import { SendMessageArgs } from '../../../../../../backend/src/util/types';
+import { MessagesData } from '../../../../util/types';
 
 type InputProps = {
 	session: Session;
@@ -31,9 +32,46 @@ const MessageInput = ({ session, conversationId }: InputProps) => {
 				content: messageContent,
 			};
 
+			setMessageContent('');
+
 			const { data, errors } = await sendMessage({
 				variables: {
 					...newMessage,
+				},
+				optimisticResponse: {
+					sendMessage: true,
+				},
+				update: (cache) => {
+					const existingMessages = cache.readQuery<MessagesData>({
+						query: MessageOperations.Queries.messages,
+						variables: {
+							conversationId,
+						},
+					}) as MessagesData;
+					cache.writeQuery<MessagesData, { conversationId: string }>({
+						query: MessageOperations.Queries.messages,
+						variables: {
+							conversationId,
+						},
+						data: {
+							...existingMessages,
+							messages: [
+								{
+									id: messageId,
+									content: messageContent,
+									userId: session.user.id,
+									conversationId,
+									user: {
+										id: session.user.id,
+										username: session.user.username,
+									},
+									createdAt: new Date(Date.now()),
+									updatedAt: new Date(Date.now()),
+								},
+								...(existingMessages?.messages || []),
+							],
+						},
+					});
 				},
 			});
 

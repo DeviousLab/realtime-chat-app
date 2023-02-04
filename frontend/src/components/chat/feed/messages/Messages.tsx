@@ -40,7 +40,10 @@ const Messages = ({ userId, conversationId }: MessagesProps) => {
 				if (!subscriptionData) return prev;
 				const newMessage = subscriptionData.data.messageSent;
 				return Object.assign({}, prev, {
-					messages: [newMessage, ...prev.messages],
+					messages:
+						newMessage.user.id === userId
+							? prev.messages
+							: [newMessage, ...prev.messages],
 				});
 			},
 		});
