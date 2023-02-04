@@ -8,6 +8,7 @@ import ConversationList from './ConversationList';
 import ConversationOperations from '../../../graphql/operations/conversation';
 import { ConversationsData } from '../../../util/types';
 import { ConversationPopulated } from '../../../../../backend/src/util/types';
+import SkeletonLoader from '../../SkeletonLoader';
 
 type ConversationsWrapperProps = {
 	session: Session;
@@ -54,7 +55,6 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 		subscribeToNewConversations();
 	}, []);
 
-
 	return (
 		<Box
 			width={{ base: '100%', md: '25rem' }}
@@ -70,6 +70,7 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 				session={session}
 				conversations={conversationData?.getConversations || []}
 				onViewConversation={onViewConversation}
+				loading={conversationLoading}
 			/>
 		</Box>
 	);
