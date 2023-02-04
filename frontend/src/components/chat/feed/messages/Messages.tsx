@@ -2,10 +2,15 @@ import { useQuery } from '@apollo/client';
 import { Flex, Stack } from '@chakra-ui/react';
 import { toast } from 'react-hot-toast';
 
-import { MessagesData, MessageSubscriptionData, MessageVariables } from '../../../../util/types';
+import {
+	MessagesData,
+	MessageSubscriptionData,
+	MessageVariables,
+} from '../../../../util/types';
 import MessageOperations from '../../../../graphql/operations/messages';
 import SkeletonLoader from '../../../SkeletonLoader';
 import { useEffect } from 'react';
+import MessageItem from './MessageItem';
 
 type MessagesProps = {
 	userId: string;
@@ -37,17 +42,15 @@ const Messages = ({ userId, conversationId }: MessagesProps) => {
 				return Object.assign({}, prev, {
 					messages: [newMessage, ...prev.messages],
 				});
-			}
+			},
 		});
 	};
 
 	useEffect(() => {
 		subscribeToNewMessages(conversationId);
-	}, [conversationId])
-	
+	}, [conversationId]);
 
 	if (error) return null;
-
 
 	return (
 		<Flex direction='column' justify='flex-end' overflow='hidden'>
@@ -59,7 +62,11 @@ const Messages = ({ userId, conversationId }: MessagesProps) => {
 			{data?.messages && (
 				<Flex direction='column-reverse' overflow='scroll' height='100%'>
 					{data.messages.map((message) => (
-						<p key={message.id}>{message.content}</p>
+						<MessageItem
+							key={message.id}
+							message={message}
+							sentByMe={message.user.id === userId}
+						/>
 					))}
 				</Flex>
 			)}
