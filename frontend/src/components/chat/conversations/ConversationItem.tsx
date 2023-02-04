@@ -9,7 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { formatRelative } from "date-fns";
-import enUS from "date-fns/locale/en-US";
+import enGB from "date-fns/locale/en-GB";
 import React, { useState } from "react";
 import { GoPrimitiveDot } from "react-icons/go";
 import { MdDeleteOutline } from "react-icons/md";
@@ -22,7 +22,7 @@ const formatRelativeLocale = {
   lastWeek: "eeee",
   yesterday: "'Yesterday",
   today: "p",
-  other: "MM/dd/yy",
+  other: "dd/MM/yy",
 };
 
 type ConversationItemProps = {
@@ -115,7 +115,7 @@ const ConversationItem = ({ conversation, userId, onClick, isSelected }: Convers
         >
           {formatRelative(new Date(conversation.updatedAt), new Date(), {
             locale: {
-              ...enUS,
+              ...enGB,
               formatRelative: (token) =>
                 formatRelativeLocale[
                   token as keyof typeof formatRelativeLocale

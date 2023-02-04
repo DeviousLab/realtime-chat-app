@@ -19,7 +19,7 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 		loading: conversationLoading,
 		error: conversationError,
 		subscribeToMore,
-	} = useQuery<ConversationsData, null>(
+	} = useQuery<ConversationsData>(
 		ConversationOperations.Queries.getConversations
 	);
 	const router = useRouter();
@@ -38,7 +38,6 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 				}
 			) => {
 				if (!subscriptionData.data) return prev;
-				console.log('subscriptionData: ', subscriptionData);
 				const newConversation = subscriptionData.data.conversationCreated;
 				return Object.assign({}, prev, {
 					getConversations: [newConversation, ...prev.getConversations],
@@ -55,7 +54,6 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 		subscribeToNewConversations();
 	}, []);
 
-	console.log(conversationData);
 	return (
 		<Box
 			width={{ base: '100%', md: '25rem' }}
@@ -71,6 +69,7 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 				session={session}
 				conversations={conversationData?.getConversations || []}
 				onViewConversation={onViewConversation}
+				loading={conversationLoading}
 			/>
 		</Box>
 	);
