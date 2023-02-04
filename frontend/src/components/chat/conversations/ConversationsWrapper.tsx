@@ -8,7 +8,6 @@ import ConversationList from './ConversationList';
 import ConversationOperations from '../../../graphql/operations/conversation';
 import { ConversationsData } from '../../../util/types';
 import { ConversationPopulated } from '../../../../../backend/src/util/types';
-import SkeletonLoader from '../../SkeletonLoader';
 
 type ConversationsWrapperProps = {
 	session: Session;
@@ -20,7 +19,7 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 		loading: conversationLoading,
 		error: conversationError,
 		subscribeToMore,
-	} = useQuery<ConversationsData, null>(
+	} = useQuery<ConversationsData>(
 		ConversationOperations.Queries.getConversations
 	);
 	const router = useRouter();

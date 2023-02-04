@@ -14,8 +14,8 @@ const typeDefs = gql`
 		sendMessage(
 			id: String
 			conversationId: String
-			senderId: String
-			body: String
+			userId: String
+			content: String
 		): Boolean
 	}
 

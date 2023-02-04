@@ -75,14 +75,14 @@ const resolvers = {
 			context: GraphQLContext
 		): Promise<boolean> => {
 			const { session, prisma, pubsub } = context;
-			const { id: messageId, conversationId, senderId, body } = args;
+			const { id: messageId, conversationId, userId, content } = args;
 
 			if (!session?.user) {
 				throw new GraphQLError('Unauthorised');
 			}
 			const { id: sessionUserId } = session.user;
 
-			if (sessionUserId !== senderId) {
+			if (sessionUserId !== userId) {
 				throw new GraphQLError('Unauthorised');
 			}
 
@@ -91,11 +91,20 @@ const resolvers = {
 					data: {
 						id: messageId,
 						conversationId,
-						userId: senderId,
-						content: body,
+						userId,
+						content,
 					},
 					include: MessagePopulate,
 				});
+				const participant = await prisma.conversationParticipant.findFirst({
+					where: {
+						userId: sessionUserId,
+						conversationId,
+					}
+				});
+				if (!participant) {
+					throw new GraphQLError('Participant not found');
+				}
 				const conversation = await prisma.conversation.update({
 					where: {
 						id: conversationId,
@@ -105,7 +114,7 @@ const resolvers = {
 						participants: {
 							update: {
 								where: {
-									id: senderId,
+									id: participant.id,
 								},
 								data: {
 									hasSeenLatestMessage: true,
@@ -114,7 +123,7 @@ const resolvers = {
 							updateMany: {
 								where: {
 									NOT: {
-										id: sessionUserId,
+										userId,
 									},
 								},
 								data: {
@@ -123,6 +132,7 @@ const resolvers = {
 							},
 						},
 					},
+					include: ConversationPopulate,
 				});
 
 				pubsub.publish('MESSAGE_SENT', { messageSent: newMessage });

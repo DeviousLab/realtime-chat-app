@@ -38,8 +38,8 @@ export interface ConversationCreatedSubscriptionPayload {
 export interface SendMessageArgs {
   id: string;
   conversationId: string;
-  senderId: string;
-  body: string;
+  userId: string;
+  content: string;
 }
 
 export type MessagePopulated = Prisma.MessageGetPayload<{
