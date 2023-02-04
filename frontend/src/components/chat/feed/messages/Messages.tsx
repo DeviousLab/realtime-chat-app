@@ -2,9 +2,10 @@ import { useQuery } from '@apollo/client';
 import { Flex, Stack } from '@chakra-ui/react';
 import { toast } from 'react-hot-toast';
 
-import { MessagesData, MessageVariables } from '../../../../util/types';
+import { MessagesData, MessageSubscriptionData, MessageVariables } from '../../../../util/types';
 import MessageOperations from '../../../../graphql/operations/messages';
 import SkeletonLoader from '../../../SkeletonLoader';
+import { useEffect } from 'react';
 
 type MessagesProps = {
 	userId: string;
@@ -24,7 +25,29 @@ const Messages = ({ userId, conversationId }: MessagesProps) => {
 		},
 	});
 
+	const subscribeToNewMessages = (conversationId: string) => {
+		subscribeToMore({
+			document: MessageOperations.Subscriptions.messageSent,
+			variables: {
+				conversationId,
+			},
+			updateQuery: (prev, { subscriptionData }: MessageSubscriptionData) => {
+				if (!subscriptionData) return prev;
+				const newMessage = subscriptionData.data.messageSent;
+				return Object.assign({}, prev, {
+					messages: [newMessage, ...prev.messages],
+				});
+			}
+		});
+	};
+
+	useEffect(() => {
+		subscribeToNewMessages(conversationId);
+	}, [conversationId])
+	
+
 	if (error) return null;
+
 
 	return (
 		<Flex direction='column' justify='flex-end' overflow='hidden'>
