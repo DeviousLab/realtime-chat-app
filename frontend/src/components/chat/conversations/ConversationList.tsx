@@ -11,7 +11,10 @@ import ConversationModal from './modal/ConversationModal';
 type ConversationListProps = {
 	session: Session;
 	conversations: Array<ConversationPopulated>;
-	onViewConversation: (conversationId: string) => void;
+	onViewConversation: (
+		conversationId: string,
+		hasSeenLatestMessage: boolean
+	) => void;
 	loading: boolean;
 };
 
@@ -28,10 +31,7 @@ const ConversationList = ({
 	const onClose = () => setIsOpen(false);
 
 	return (
-		<Box
-			width='100%'
-			flexDirection='column'
-		>
+		<Box width='100%' flexDirection='column'>
 			<Box
 				py={2}
 				px={4}
@@ -47,19 +47,33 @@ const ConversationList = ({
 			</Box>
 			<ConversationModal isOpen={isOpen} onClose={onClose} session={session} />
 			{loading ? (
-				<Stack py={2} width="100%">
+				<Stack py={2} width='100%'>
 					<SkeletonLoader count={5} height='4rem' width='12.5rem' />
 				</Stack>
 			) : (
-				conversations.map((conversation) => (
-					<ConversationItem
-						key={conversation.id}
-						conversation={conversation}
-						onClick={() => onViewConversation(conversation.id)}
-						isSelected={conversation.id === router.query.conversationId}
-						userId={session.user.id}
-					/>
-				))
+				conversations.map((conversation) => {
+					const participants = conversation.participants.find(
+						(participant) => participant.user.id !== session.user.id
+					);
+					if (!participants) {
+						throw new Error('No participants found');
+					};
+					return (
+						<ConversationItem
+							key={conversation.id}
+							conversation={conversation}
+							onClick={() =>
+								onViewConversation(
+									conversation.id,
+									participants?.hasSeenLatestMessage
+								)
+							}
+							hasSeenLatestMessage={participants?.hasSeenLatestMessage}
+							isSelected={conversation.id === router.query.conversationId}
+							userId={session.user.id}
+						/>
+					);
+				})
 			)}
 		</Box>
 	);

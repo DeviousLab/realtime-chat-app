@@ -29,11 +29,13 @@ type ConversationItemProps = {
   conversation: ConversationPopulated;
   userId: string;
   onClick: () => void;
+  hasSeenLatestMessage?: boolean;
   isSelected: boolean;
 }
 
-const ConversationItem = ({ conversation, userId, onClick, isSelected }: ConversationItemProps) => {
+const ConversationItem = ({ conversation, userId, onClick, hasSeenLatestMessage, isSelected }: ConversationItemProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  console.log(hasSeenLatestMessage)
 
   const handleClick = (e: React.MouseEvent) => {
     if (e.type === "click") {
@@ -82,6 +84,9 @@ const ConversationItem = ({ conversation, userId, onClick, isSelected }: Convers
         </MenuList>
       </Menu>
       <Flex position="absolute" left="-6px">
+        {hasSeenLatestMessage === false && (
+          <GoPrimitiveDot size={20} color="#3D84F7" />
+        )}
       </Flex>
       <Avatar />
       <Flex justify="space-between" width="80%" height="100%">

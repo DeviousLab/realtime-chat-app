@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { Box } from '@chakra-ui/react';
 import { Session } from 'next-auth';
 import { useEffect } from 'react';
@@ -7,7 +7,10 @@ import { useRouter } from 'next/router';
 import ConversationList from './ConversationList';
 import ConversationOperations from '../../../graphql/operations/conversation';
 import { ConversationsData } from '../../../util/types';
-import { ConversationPopulated } from '../../../../../backend/src/util/types';
+import {
+	ConversationPopulated,
+	ParticipantPopulated,
+} from '../../../../../backend/src/util/types';
 
 type ConversationsWrapperProps = {
 	session: Session;
@@ -22,6 +25,11 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 	} = useQuery<ConversationsData>(
 		ConversationOperations.Queries.getConversations
 	);
+
+	const [markConversationAsRead] = useMutation<
+		{ markConversationAsRead: boolean },
+		{ userId: string; conversationId: string }
+	>(ConversationOperations.Mutations.markConversationAsRead);
 	const router = useRouter();
 
 	const subscribeToNewConversations = () => {
@@ -46,8 +54,70 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 		});
 	};
 
-	const onViewConversation = async (conversationId: string) => {
+	const onViewConversation = async (
+		conversationId: string,
+		hasSeenLatestMessage: boolean
+	) => {
 		router.push({ query: { conversationId } });
+
+		if (hasSeenLatestMessage) return;
+
+		try {
+			await markConversationAsRead({
+				variables: {
+					userId: session.user.id,
+					conversationId,
+				},
+				optimisticResponse: {
+					markConversationAsRead: true,
+				},
+				update: (cache) => {
+					const participantsFragment = cache.readFragment<{
+						participants: Array<ParticipantPopulated>;
+					}>({
+						id: `Conversation:${conversationId}`,
+						fragment: gql`
+							fragment Participants on Conversation {
+								participants {
+									user {
+										id
+										username
+									}
+									hasSeenLatestMessage
+								}
+							}
+						`,
+					});
+					console.log(participantsFragment)
+					if (!participantsFragment) return;
+
+					const participants = [...participantsFragment.participants];
+					const participantIndex = participants.findIndex(
+						(participant) => participant.user.id === session.user.id
+					);
+					if (participantIndex === -1) return;
+					const userParticipant = participants[participantIndex];
+					participants[participantIndex] = {
+						...userParticipant,
+						hasSeenLatestMessage: true,
+					};
+
+					cache.writeFragment({
+						id: `Conversation:${conversationId}`,
+						fragment: gql`
+							fragment UpdatedParticipants on Conversation {
+								participants
+							}
+						`,
+						data: {
+							participants,
+						},
+					});
+				},
+			});
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	useEffect(() => {
