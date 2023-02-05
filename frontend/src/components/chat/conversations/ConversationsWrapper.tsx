@@ -61,7 +61,7 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 		router.push({ query: { conversationId } });
 
 		if (hasSeenLatestMessage) return;
-
+		console.log(hasSeenLatestMessage)
 		try {
 			await markConversationAsRead({
 				variables: {
@@ -88,12 +88,11 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 							}
 						`,
 					});
-					console.log(participantsFragment)
 					if (!participantsFragment) return;
 
 					const participants = [...participantsFragment.participants];
 					const participantIndex = participants.findIndex(
-						(participant) => participant.user.id === session.user.id
+						(participant) => participant.user.id !== session.user.id
 					);
 					if (participantIndex === -1) return;
 					const userParticipant = participants[participantIndex];

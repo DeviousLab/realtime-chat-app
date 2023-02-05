@@ -35,7 +35,6 @@ type ConversationItemProps = {
 
 const ConversationItem = ({ conversation, userId, onClick, hasSeenLatestMessage, isSelected }: ConversationItemProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  console.log(hasSeenLatestMessage)
 
   const handleClick = (e: React.MouseEvent) => {
     if (e.type === "click") {

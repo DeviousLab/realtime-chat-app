@@ -65,7 +65,7 @@ const resolvers = {
 							createMany: {
 								data: participantIds.map((participantId) => ({
 									userId: participantId,
-									hasSeenLatestMessage: participantId === userId,
+									hasSeenLatestMessage: participantId !== userId,
 								})),
 							},
 						},
@@ -98,15 +98,15 @@ const resolvers = {
 			try {
 				const participant = await prisma.conversationParticipant.findFirst({
 					where: {
-						userId,
 						conversationId,
+						hasSeenLatestMessage: false,
 					},
 				});
 
 				if (!participant) {
 					throw new GraphQLError('Participant not found');
 				}
-
+				console.log(participant.id, userId, conversationId)
 				await prisma.conversationParticipant.update({
 					where: {
 						id: participant.id,
@@ -114,8 +114,8 @@ const resolvers = {
 					data: {
 						hasSeenLatestMessage: true,
 					}
+					
 				});
-				return true;
 			} catch (error) {
 				console.error(error);
 				throw new GraphQLError('Error marking conversation as read');
