@@ -53,3 +53,7 @@ export interface MessageSubscriptionData {
 		}
 	}
 }
+
+export interface ConversationUpdatedData {
+	conversationUpdated: ConversationPopulated;
+	}

@@ -49,3 +49,7 @@ export type MessagePopulated = Prisma.MessageGetPayload<{
 export interface MessageSendSubscriptionPayload {
   messageSent: Prisma.MessageGetPayload<{}>
 }
+
+export interface ConversationUpdatedSubscriptionPayload {
+  conversationUpdated: ConversationPopulated
+  }

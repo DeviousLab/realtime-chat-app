@@ -5,8 +5,10 @@ import { withFilter } from 'graphql-subscriptions';
 import {
 	ConversationCreatedSubscriptionPayload,
 	ConversationPopulated,
+	ConversationUpdatedSubscriptionPayload,
 	GraphQLContext,
 } from '../../util/types';
+import { userIsConversationParticipant } from '../../util/functions';
 
 const resolvers = {
 	Query: {
@@ -106,15 +108,13 @@ const resolvers = {
 				if (!participant) {
 					throw new GraphQLError('Participant not found');
 				}
-				console.log(participant.id, userId, conversationId)
 				await prisma.conversationParticipant.update({
 					where: {
 						id: participant.id,
 					},
 					data: {
 						hasSeenLatestMessage: true,
-					}
-					
+					},
 				});
 			} catch (error) {
 				console.error(error);
@@ -133,17 +133,49 @@ const resolvers = {
 				},
 				(
 					payload: ConversationCreatedSubscriptionPayload,
-					_,
+					_: any,
 					context: GraphQLContext
 				) => {
 					const { session } = context;
+
+					if (!session?.user) {
+						throw new GraphQLError('Not authenticated');
+					}
 					const {
 						conversationCreated: { participants },
 					} = payload;
 
-					const userIsParticipant = !!participants.find(
-						(participant) => participant.userId === session?.user?.id
+					const userIsParticipant = userIsConversationParticipant(
+						participants,
+						session.user.id
 					);
+
+					return userIsParticipant;
+				}
+			),
+		},
+		conversationUpdated: {
+			subscribe: withFilter(
+				(_: any, __: any, context: GraphQLContext) => {
+					const { pubsub } = context;
+
+					return pubsub.asyncIterator(['CONVERSATION_UPDATED']);
+				},
+				(
+					payload: ConversationUpdatedSubscriptionPayload,
+					_: any,
+					context: GraphQLContext
+				) => {
+					const { session } = context;
+
+					if (!session?.user) {
+						throw new GraphQLError('Not authenticated');
+					}
+
+					const { id: userId } = session.user;
+					
+					const { conversationUpdated: { participants } } = payload;
+					const userIsParticipant = userIsConversationParticipant(participants, userId);
 
 					return userIsParticipant;
 				}

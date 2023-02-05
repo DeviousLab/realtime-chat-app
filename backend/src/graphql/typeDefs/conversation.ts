@@ -36,6 +36,10 @@ const typeDefs = gql`
   type Subscription {
     conversationCreated: Conversation
   }
+
+  type Subscription {
+    conversationUpdated: Conversation
+  }
 `;
 
 export default typeDefs;
