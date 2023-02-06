@@ -30,10 +30,11 @@ type ConversationItemProps = {
   userId: string;
   onClick: () => void;
   hasSeenLatestMessage?: boolean;
+  onDeleteConversation: (conversationId: string) => void;
   isSelected: boolean;
 }
 
-const ConversationItem = ({ conversation, userId, onClick, hasSeenLatestMessage, isSelected }: ConversationItemProps) => {
+const ConversationItem = ({ conversation, userId, onClick, hasSeenLatestMessage, isSelected, onDeleteConversation }: ConversationItemProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -61,19 +62,10 @@ const ConversationItem = ({ conversation, userId, onClick, hasSeenLatestMessage,
       <Menu isOpen={menuOpen} onClose={() => setMenuOpen(false)}>
         <MenuList bg="#2d2d2d">
           <MenuItem
-            icon={<AiOutlineEdit fontSize={20} />}
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-            bg="#2d2d2d"
-            _hover={{ bg: "whiteAlpha.300" }}
-          >
-            Edit
-          </MenuItem>
-          <MenuItem
             icon={<MdDeleteOutline fontSize={20} />}
             onClick={(event) => {
               event.stopPropagation();
+              onDeleteConversation(conversation.id);
             }}
             bg="#2d2d2d"
             _hover={{ bg: "whiteAlpha.300" }}

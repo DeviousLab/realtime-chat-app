@@ -53,3 +53,7 @@ export interface MessageSendSubscriptionPayload {
 export interface ConversationUpdatedSubscriptionPayload {
   conversationUpdated: ConversationPopulated
   }
+
+export interface ConversationDeletedSubscriptionPayload {
+  conversationDeleted: ConversationPopulated
+}

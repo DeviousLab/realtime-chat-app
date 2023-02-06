@@ -4,6 +4,7 @@ import { withFilter } from 'graphql-subscriptions';
 
 import {
 	ConversationCreatedSubscriptionPayload,
+	ConversationDeletedSubscriptionPayload,
 	ConversationPopulated,
 	ConversationUpdatedSubscriptionPayload,
 	GraphQLContext,
@@ -91,7 +92,7 @@ const resolvers = {
 			context: GraphQLContext
 		): Promise<boolean> => {
 			const { session, prisma } = context;
-			const { userId, conversationId } = args;
+			const { conversationId } = args;
 
 			if (!session?.user) {
 				throw new GraphQLError('Not authenticated');
@@ -120,6 +121,48 @@ const resolvers = {
 				console.error(error);
 				throw new GraphQLError('Error marking conversation as read');
 			}
+			return true;
+		},
+		deleteConversation: async (
+			_: any,
+			args: { conversationId: string },
+			context: GraphQLContext
+		): Promise<boolean> => {
+			const { session, prisma, pubsub } = context;
+			const { conversationId } = args;
+
+			if (!session?.user) {
+				throw new GraphQLError('Not authenticated');
+			}
+
+			try {
+				const [deletedConversation] = await prisma.$transaction([
+					prisma.conversation.delete({
+						where: {
+							id: conversationId,
+						},
+						include: ConversationPopulate,
+					}),
+					prisma.conversationParticipant.deleteMany({
+						where: {
+							conversationId,
+						},
+					}),
+					prisma.message.deleteMany({
+						where: {
+							conversationId,
+						},
+					}),
+				]);
+
+				pubsub.publish('CONVERSATION_DELETED', {
+					conversationDeleted: deletedConversation,
+				});
+			} catch (error) {
+				console.error(error);
+				throw new GraphQLError('Error deleting conversation');
+			}
+
 			return true;
 		},
 	},
@@ -173,14 +216,51 @@ const resolvers = {
 					}
 
 					const { id: userId } = session.user;
-					
-					const { conversationUpdated: { participants } } = payload;
-					const userIsParticipant = userIsConversationParticipant(participants, userId);
+
+					const {
+						conversationUpdated: { participants },
+					} = payload;
+					const userIsParticipant = userIsConversationParticipant(
+						participants,
+						userId
+					);
 
 					return userIsParticipant;
 				}
 			),
 		},
+		conversationDeleted: {
+			subscribe: withFilter(
+				(_: any, __: any, context: GraphQLContext) => {
+					const { pubsub } = context;
+
+					return pubsub.asyncIterator(['CONVERSATION_UPDATED']);
+				},
+				(
+					payload: ConversationDeletedSubscriptionPayload,
+					_: any,
+					context: GraphQLContext
+				) => {
+					const { session } = context;
+
+					if (!session?.user) {
+						throw new GraphQLError('Not authenticated');
+					}
+
+					const { id: userId } = session.user;
+
+					const {
+						conversationDeleted: { participants },
+					} = payload;
+					const userIsParticipant = userIsConversationParticipant(
+						participants,
+						userId
+					);
+
+					return userIsParticipant;
+				}
+			),
+		}
 	},
 };
 
