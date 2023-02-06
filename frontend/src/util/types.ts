@@ -57,3 +57,7 @@ export interface MessageSubscriptionData {
 export interface ConversationUpdatedData {
 	conversationUpdated: ConversationPopulated;
 	}
+
+export interface ConversationDeletedData {
+	conversationDeleted: ConversationPopulated;
+}

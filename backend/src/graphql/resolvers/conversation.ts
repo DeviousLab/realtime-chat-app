@@ -234,7 +234,7 @@ const resolvers = {
 				(_: any, __: any, context: GraphQLContext) => {
 					const { pubsub } = context;
 
-					return pubsub.asyncIterator(['CONVERSATION_UPDATED']);
+					return pubsub.asyncIterator(['CONVERSATION_DELETED']);
 				},
 				(
 					payload: ConversationDeletedSubscriptionPayload,
@@ -260,7 +260,7 @@ const resolvers = {
 					return userIsParticipant;
 				}
 			),
-		}
+		},
 	},
 };
 

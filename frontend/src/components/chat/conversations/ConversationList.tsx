@@ -49,7 +49,11 @@ const ConversationList = ({
 				deleteConversation({
 					variables: { conversationId },
 					update: (cache) => {
-						router.replace(typeof process.env.NEXT_PUBLIC_BASE_URL === 'string' ? process.env.NEXT_PUBLIC_BASE_URL : '');
+						router.replace(
+							typeof process.env.NEXT_PUBLIC_BASE_URL === 'string'
+								? process.env.NEXT_PUBLIC_BASE_URL
+								: ''
+						);
 					},
 				}),
 				{
@@ -64,7 +68,12 @@ const ConversationList = ({
 	};
 
 	return (
-		<Box width='24rem' flexDirection='column' position="relative">
+		<Box
+			width={{ base: '100%', md: '24rem' }}
+			flexDirection='column'
+			position='relative'
+			overflow='hidden'
+		>
 			<Box
 				py={2}
 				px={4}
@@ -109,8 +118,8 @@ const ConversationList = ({
 					);
 				})
 			)}
-			<Box position="absolute" bottom={0} left={0} px={8} py={6} width="100%">
-				<Button width="100%" onClick={() => signOut()}>
+			<Box position='absolute' bottom={0} left={0} px={8} py={4} width='100%'>
+				<Button width='100%' onClick={() => signOut()}>
 					Sign Out
 				</Button>
 			</Box>

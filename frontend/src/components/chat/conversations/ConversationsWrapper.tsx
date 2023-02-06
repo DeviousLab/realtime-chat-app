@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import ConversationList from './ConversationList';
 import ConversationOperations from '../../../graphql/operations/conversation';
 import {
+	ConversationDeletedData,
 	ConversationsData,
 	ConversationUpdatedData,
 } from '../../../util/types';
@@ -43,13 +44,44 @@ const ConversationsWrapper = ({ session }: ConversationsWrapperProps) => {
 
 				const { conversationUpdated } = subscriptionData;
 
-				const currentConversation =  conversationUpdated.id === router.query.conversationId;
+				const currentConversation =
+					conversationUpdated.id === router.query.conversationId;
 				if (currentConversation) {
 					onViewConversation(router.query.conversationId as string, true);
 				}
 			},
 		}
 	);
+
+	useSubscription<ConversationDeletedData>(
+		ConversationOperations.Subscriptions.conversationDeleted,
+		{
+			onData: ({ client, data }) => {
+				const { data: subscriptionData } = data;
+				if (!subscriptionData) return;
+
+				const { conversationDeleted } = subscriptionData;
+
+				const existingConversations = client.readQuery<ConversationsData>({
+					query: ConversationOperations.Queries.getConversations,
+				});
+				if (!existingConversations) return;
+
+				const { getConversations } = existingConversations;
+
+				client.writeQuery<ConversationsData>({
+					query: ConversationOperations.Queries.getConversations,
+					data: {
+						getConversations: getConversations.filter(
+							(conversation) => conversation.id !== conversationDeleted.id
+						),
+					},
+				});
+				router.push('/');
+			},
+		}
+	);
+
 	const router = useRouter();
 
 	const subscribeToNewConversations = () => {
