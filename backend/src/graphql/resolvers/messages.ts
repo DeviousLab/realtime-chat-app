@@ -117,7 +117,7 @@ const resolvers = {
 									id: participant.id,
 								},
 								data: {
-									hasSeenLatestMessage: true,
+									hasSeenLatestMessage: false,
 								},
 							},
 							updateMany: {
@@ -127,7 +127,7 @@ const resolvers = {
 									},
 								},
 								data: {
-									hasSeenLatestMessage: false,
+									hasSeenLatestMessage: true,
 								},
 							},
 						},

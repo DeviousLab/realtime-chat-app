@@ -35,14 +35,41 @@ export default {
 				}
 			}
 		`,
+		markConversationAsRead: gql`
+			mutation MarkConversationAsRead(
+				$userId: String!
+				$conversationId: String!
+			) {
+				markConversationAsRead(userId: $userId, conversationId: $conversationId)
+			}
+		`,
+		deleteConversation: gql`
+			mutation DeleteConversation($conversationId: String!) {
+				deleteConversation(conversationId: $conversationId)
+			}
+		`,
 	},
 	Subscriptions: {
-    conversationCreated: gql`
+		conversationCreated: gql`
       subscription ConversationCreated {
         conversationCreated {
           ${ConversationFields}
         }
       }
-    `
-  },
+    `,
+		conversationUpdated: gql`
+			subscription ConversationUpdated {
+				conversationUpdated {
+					${ConversationFields}
+				}
+			}
+		`,
+		conversationDeleted: gql`
+			subscription ConversationDeleted {
+				conversationDeleted {
+					${ConversationFields}
+				}
+			}
+		`,
+	},
 };

@@ -12,7 +12,7 @@ interface MessagesHeaderProps {
 
 const MessagesHeader = ({ userId, conversationId }: MessagesHeaderProps) => {
 	const router = useRouter();
-	const { data, loading } = useQuery<ConversationsData, null>(
+	const { data, loading } = useQuery<ConversationsData>(
 		ConversationOperations.Queries.getConversations
 	);
 

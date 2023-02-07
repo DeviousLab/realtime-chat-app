@@ -29,10 +29,12 @@ type ConversationItemProps = {
   conversation: ConversationPopulated;
   userId: string;
   onClick: () => void;
+  hasSeenLatestMessage?: boolean;
+  onDeleteConversation: (conversationId: string) => void;
   isSelected: boolean;
 }
 
-const ConversationItem = ({ conversation, userId, onClick, isSelected }: ConversationItemProps) => {
+const ConversationItem = ({ conversation, userId, onClick, hasSeenLatestMessage, isSelected, onDeleteConversation }: ConversationItemProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -60,19 +62,10 @@ const ConversationItem = ({ conversation, userId, onClick, isSelected }: Convers
       <Menu isOpen={menuOpen} onClose={() => setMenuOpen(false)}>
         <MenuList bg="#2d2d2d">
           <MenuItem
-            icon={<AiOutlineEdit fontSize={20} />}
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-            bg="#2d2d2d"
-            _hover={{ bg: "whiteAlpha.300" }}
-          >
-            Edit
-          </MenuItem>
-          <MenuItem
             icon={<MdDeleteOutline fontSize={20} />}
             onClick={(event) => {
               event.stopPropagation();
+              onDeleteConversation(conversation.id);
             }}
             bg="#2d2d2d"
             _hover={{ bg: "whiteAlpha.300" }}
@@ -82,6 +75,9 @@ const ConversationItem = ({ conversation, userId, onClick, isSelected }: Convers
         </MenuList>
       </Menu>
       <Flex position="absolute" left="-6px">
+        {hasSeenLatestMessage === false && (
+          <GoPrimitiveDot size={20} color="#3D84F7" />
+        )}
       </Flex>
       <Avatar />
       <Flex justify="space-between" width="80%" height="100%">

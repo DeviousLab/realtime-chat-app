@@ -69,10 +69,10 @@ model Conversation {
 model ConversationParticipant {
   id                   String       @id @default(auto()) @map("_id") @db.ObjectId
   conversationId       String       @db.ObjectId
-  conversation         Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation         Conversation @relation(fields: [conversationId], references: [id])
   userId               String       @db.ObjectId
-  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hasSeenLatestMessage Boolean      @default(false)
+  user                 User         @relation(fields: [userId], references: [id])
+  hasSeenLatestMessage Boolean
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
 }
@@ -80,9 +80,9 @@ model ConversationParticipant {
 model Message {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
   conversationId String        @db.ObjectId
-  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation   Conversation  @relation(fields: [conversationId], references: [id])
   userId         String        @db.ObjectId
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id])
   isLatestIn     Conversation? @relation(name: "lastestConversationMessage")
   content        String
   createdAt      DateTime      @default(now())
