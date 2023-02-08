@@ -13,8 +13,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "typeRoots" : ["./src/lib", "./node_modules/@types"]
+    "typeRoots" : ["./src/lib", "./node_modules/@types"],
+    "outDir": "./dist",
   },
   "ts-node": {
     "esm": true,
