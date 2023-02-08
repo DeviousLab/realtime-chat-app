@@ -101,7 +101,7 @@ type Conversation = {
 	lastMessageId: string | null;
 }
 
-type ConversationPopulated = Conversation & {
+export type ConversationPopulated = Conversation & {
 	lastMessage:(Message & {
 		user: {
 			id: string;

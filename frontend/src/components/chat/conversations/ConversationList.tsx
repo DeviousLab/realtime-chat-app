@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { signOut } from 'next-auth/react';
 
-import { ConversationPopulated } from '../../../../../backend/src/util/types';
+import { ConversationPopulated } from "../../../util/types";
 import SkeletonLoader from '../../SkeletonLoader';
 import ConversationItem from './ConversationItem';
 import ConversationModal from './modal/ConversationModal';

@@ -13,10 +13,9 @@ import enGB from "date-fns/locale/en-GB";
 import React, { useState } from "react";
 import { GoPrimitiveDot } from "react-icons/go";
 import { MdDeleteOutline } from "react-icons/md";
-import { AiOutlineEdit } from "react-icons/ai";
 
 import { formatUsernames } from "../../../util/functions";
-import { ConversationPopulated } from "../../../../../backend/src/util/types";
+import { ConversationPopulated } from "../../../util/types";
 
 const formatRelativeLocale = {
   lastWeek: "eeee",
