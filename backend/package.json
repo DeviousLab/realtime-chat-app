@@ -5,7 +5,10 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --files src/index.ts"
+    "dev": "nodemon --files src/index.ts",
+    "build": "tsc",
+    "postinstall": "prisma generate --schema=src/prisma/schema.prisma",
+    "start": "node dist/index.js"
   },
   "keywords": [
     "graphql",
