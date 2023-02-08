@@ -26,6 +26,7 @@ async function main() {
 	const schema = makeExecutableSchema({ typeDefs, resolvers });
 	const prisma = new PrismaClient();
 	const pubsub = new PubSub();
+	const port = process.env.PORT || 3001;
 
 	const wsServer = new WebSocketServer({
 		server: httpServer,
@@ -76,7 +77,7 @@ async function main() {
   );
 
 	await new Promise<void>((resolve) =>
-		httpServer.listen({ port: 4000 }, resolve)
+		httpServer.listen({ port }, resolve)
 	);
 	console.log('🚀 Server ready at http://localhost:4000/graphql');
 }
