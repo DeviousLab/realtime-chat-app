@@ -14,7 +14,7 @@ import {
 import {
 	ConversationPopulated,
 	ParticipantPopulated,
-} from '../../../../../backend/src/util/types';
+} from '../../../util/types';
 
 type ConversationsWrapperProps = {
 	session: Session;

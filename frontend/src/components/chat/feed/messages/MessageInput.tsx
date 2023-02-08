@@ -6,8 +6,7 @@ import { toast } from 'react-hot-toast';
 import { ObjectId } from 'bson';
 
 import MessageOperations from '../../../../graphql/operations/messages';
-import { SendMessageArgs } from '../../../../../../backend/src/util/types';
-import { MessagesData } from '../../../../util/types';
+import { MessagesData, SendMessageArgs } from '../../../../util/types';
 
 type InputProps = {
 	session: Session;

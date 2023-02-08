@@ -60,12 +60,12 @@ export interface ConversationDeletedData {
 	conversationDeleted: ConversationPopulated;
 }
 
-type User = {
+export type User = {
 	id: string;
 	username: string;
 };
 
-type Message = {
+export type Message = {
 	id: string;
 	user: User;
 	content: string;
@@ -75,14 +75,14 @@ type Message = {
 	updatedAt: Date;
 };
 
-type MessagePopulated = Message & {
+export type MessagePopulated = Message & {
 	user: {
 		id: string;
 		username: string;
 	};
 };
 
-type ConversationParticipant = {
+export type ConversationParticipant = {
 	id: string;
 	user: User;
 	hasSeenLatestMessage: boolean;
@@ -92,13 +92,20 @@ type ConversationParticipant = {
 	updatedAt: Date;
 }
 
-type Conversation = {
+export type Conversation = {
 	id: string;
 	participants: Array<ConversationParticipant>;
 	lastMessage: Message;
 	createdAt: Date;
 	updatedAt: Date;
 	lastMessageId: string | null;
+}
+
+export type ParticipantPopulated = ConversationParticipant & {
+	user: {
+		id: string;
+		username: string | null;
+	}
 }
 
 export type ConversationPopulated = Conversation & {
@@ -108,10 +115,12 @@ export type ConversationPopulated = Conversation & {
 			username: string | null;
 		};
 	}) | null;
-	participants: (ConversationParticipant & {
-		user: {
-			id: string;
-			username: string | null;
-		}
-	})[];
+	participants: ParticipantPopulated[];
 }[]
+
+export interface SendMessageArgs {
+	id: string;
+	conversationId: string;
+	userId: string;
+	content: string;
+}
