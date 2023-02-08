@@ -1,5 +1,3 @@
-import { ConversationPopulated, MessagePopulated } from "../../../backend/src/util/types";
-
 export interface CreateUserData {
 	createUser: {
 		success: boolean;
@@ -27,7 +25,7 @@ export interface SearchUsersData {
 export interface CreateConversationData {
 	createConversation: {
 		conversationId: string;
-	}
+	};
 }
 
 export interface CreateConversationVariables {
@@ -35,7 +33,7 @@ export interface CreateConversationVariables {
 }
 
 export interface ConversationsData {
-	getConversations: Array<ConversationPopulated>
+	getConversations: Array<ConversationPopulated>;
 }
 
 export interface MessagesData {
@@ -50,14 +48,70 @@ export interface MessageSubscriptionData {
 	subscriptionData: {
 		data: {
 			messageSent: MessagePopulated;
-		}
-	}
+		};
+	};
 }
 
 export interface ConversationUpdatedData {
 	conversationUpdated: ConversationPopulated;
-	}
+}
 
 export interface ConversationDeletedData {
 	conversationDeleted: ConversationPopulated;
 }
+
+type User = {
+	id: string;
+	username: string;
+};
+
+type Message = {
+	id: string;
+	user: User;
+	content: string;
+	userId: string;
+	conversationId: string;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
+type MessagePopulated = Message & {
+	user: {
+		id: string;
+		username: string;
+	};
+};
+
+type ConversationParticipant = {
+	id: string;
+	user: User;
+	hasSeenLatestMessage: boolean;
+	conversationId: string;
+	userId: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
+type Conversation = {
+	id: string;
+	participants: Array<ConversationParticipant>;
+	lastMessage: Message;
+	createdAt: Date;
+	updatedAt: Date;
+	lastMessageId: string | null;
+}
+
+type ConversationPopulated = Conversation & {
+	lastMessage:(Message & {
+		user: {
+			id: string;
+			username: string | null;
+		};
+	}) | null;
+	participants: (ConversationParticipant & {
+		user: {
+			id: string;
+			username: string | null;
+		}
+	})[];
+}[]
