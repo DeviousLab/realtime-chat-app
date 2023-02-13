@@ -4,6 +4,9 @@
   "description": "GraphQL backend for realtime chat app",
   "main": "index.ts",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "nodemon --files src/index.ts",
     "build": "tsc",
